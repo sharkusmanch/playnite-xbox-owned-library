@@ -4,7 +4,8 @@ Packages:
     RequiredApiVersion: 6.17.0
     ReleaseDate: 2026-11-08
     PackageUrl: https://github.com/sharkusmanch/playnite-xbox-owned-library/releases/download/v1.1.0/XboxOwnedLibrary_v1.1.0.pext
-    Changelog: []
+    Changelog:
+      - Mark owned Xbox Play Anywhere games with a Playnite feature instead of a tag. An enabled tag setting carries over; tags added by 1.0.0 are left in place
   - Version: 1.0.0
     RequiredApiVersion: 6.17.0
     ReleaseDate: 2026-11-03
