@@ -14,7 +14,7 @@ Playnite's built-in Xbox library builds its list from your Xbox title history, w
 ## Features
 
 - Preview mode and a report of every owned game and what happened to it
-- Optional tag for owned **Xbox Play Anywhere** games, new and already in the library
+- Optional **Xbox Play Anywhere** feature on owned Play Anywhere games, new and already in the library
 - Optional import of Games with Gold titles (tagged; playable only while subscribed)
 - Optional Microsoft Store details and artwork instead of Playnite's metadata download
 - Respects Playnite's import exclusion list

@@ -35,15 +35,15 @@ namespace XboxOwnedLibrary
         public List<Game> ImportedGames { get; } = new List<Game>();
         public int AlreadyInLibrary { get; set; }
         public int Excluded { get; set; }
-        public int PlayAnywhereTagged { get; set; }
-        public bool PlayAnywhereTagEnabled { get; set; }
+        public int PlayAnywhereMarked { get; set; }
+        public bool PlayAnywhereFeatureEnabled { get; set; }
 
         public string Summary(bool dryRun) =>
             $"{OwnedGames} owned games{(GoldGames > 0 ? $" + {GoldGames} Games with Gold" : "")} in the Xbox account, " +
             $"{PcGames.Count} playable on PC. " +
             $"{AlreadyInLibrary} already in Playnite, {Excluded} on the import exclusion list, " +
             $"{(dryRun ? "would add" : "added")} {Added.Count}." +
-            (PlayAnywhereTagEnabled ? $" {(dryRun ? "Would tag" : "Tagged")} {PlayAnywhereTagged} existing game(s) as Play Anywhere." : "");
+            (PlayAnywhereFeatureEnabled ? $" {(dryRun ? "Would mark" : "Marked")} {PlayAnywhereMarked} existing game(s) with the Play Anywhere feature." : "");
     }
 
     public class OwnedGamesSync
@@ -210,9 +210,9 @@ namespace XboxOwnedLibrary
                 }
             }
 
-            var tagPlayAnywhere = _settings.AddPlayAnywhereTag && !string.IsNullOrWhiteSpace(_settings.PlayAnywhereTagName);
-            result.PlayAnywhereTagEnabled = tagPlayAnywhere;
-            var toTag = new List<Game>();
+            var markPlayAnywhere = _settings.AddPlayAnywhereFeature && !string.IsNullOrWhiteSpace(_settings.PlayAnywhereFeatureName);
+            result.PlayAnywhereFeatureEnabled = markPlayAnywhere;
+            var toMark = new List<Game>();
             var excluded = new HashSet<string>(
                 _api.Database.ImportExclusions.Where(e => e.LibraryId == XboxLibraryId && e.GameId != null).Select(e => e.GameId),
                 StringComparer.OrdinalIgnoreCase);
@@ -224,10 +224,10 @@ namespace XboxOwnedLibrary
                 {
                     candidate.Status = "already in Playnite";
                     result.AlreadyInLibrary++;
-                    if (tagPlayAnywhere && candidate.IsPlayAnywhere && !HasTag(existingGame, _settings.PlayAnywhereTagName))
+                    if (markPlayAnywhere && candidate.IsPlayAnywhere && !HasFeature(existingGame, _settings.PlayAnywhereFeatureName))
                     {
-                        candidate.Status = dryRun ? "in Playnite, would tag" : "in Playnite, tagged";
-                        toTag.Add(existingGame);
+                        candidate.Status = dryRun ? "in Playnite, would mark" : "in Playnite, marked";
+                        toMark.Add(existingGame);
                     }
                 }
                 else if (excluded.Contains(candidate.PackageFamilyName))
@@ -268,27 +268,27 @@ namespace XboxOwnedLibrary
                 result.Added.AddRange(toAdd);
             }
 
-            result.PlayAnywhereTagged = toTag.Count;
-            if (!dryRun && toTag.Count > 0)
+            result.PlayAnywhereMarked = toMark.Count;
+            if (!dryRun && toMark.Count > 0)
             {
-                var tag = _api.Database.Tags.Add(_settings.PlayAnywhereTagName.Trim(), SameName);
+                var feature = _api.Database.Features.Add(_settings.PlayAnywhereFeatureName.Trim(), SameName);
                 using (_api.Database.BufferedUpdate())
                 {
-                    foreach (var game in toTag)
+                    foreach (var game in toMark)
                     {
                         try
                         {
-                            if (game.TagIds == null)
+                            if (game.FeatureIds == null)
                             {
-                                game.TagIds = new List<Guid>();
+                                game.FeatureIds = new List<Guid>();
                             }
 
-                            game.TagIds.Add(tag.Id);
+                            game.FeatureIds.Add(feature.Id);
                             _api.Database.Games.Update(game);
                         }
                         catch (Exception e)
                         {
-                            logger.Error(e, $"Failed to tag {game.Name} as Play Anywhere.");
+                            logger.Error(e, $"Failed to add the Play Anywhere feature to {game.Name}.");
                         }
                     }
                 }
@@ -312,20 +312,14 @@ namespace XboxOwnedLibrary
                 Links = new List<Link> { new Link("Microsoft Store", $"https://www.microsoft.com/store/productId/{candidate.ProductId}") }
             };
 
-            var tags = new HashSet<MetadataProperty>();
             if (candidate.IsGold)
             {
-                tags.Add(new MetadataNameProperty(GoldTag));
+                metadata.Tags = new HashSet<MetadataProperty> { new MetadataNameProperty(GoldTag) };
             }
 
-            if (candidate.IsPlayAnywhere && _settings.AddPlayAnywhereTag && !string.IsNullOrWhiteSpace(_settings.PlayAnywhereTagName))
+            if (candidate.IsPlayAnywhere && _settings.AddPlayAnywhereFeature && !string.IsNullOrWhiteSpace(_settings.PlayAnywhereFeatureName))
             {
-                tags.Add(new MetadataNameProperty(_settings.PlayAnywhereTagName.Trim()));
-            }
-
-            if (tags.Count > 0)
-            {
-                metadata.Tags = tags;
+                metadata.Features = new HashSet<MetadataProperty> { new MetadataNameProperty(_settings.PlayAnywhereFeatureName.Trim()) };
             }
 
             // By default leave details and artwork empty so Playnite's metadata download
@@ -372,11 +366,11 @@ namespace XboxOwnedLibrary
             return metadata;
         }
 
-        private static bool SameName(Tag tag, string name) =>
-            string.Equals(tag.Name?.Trim(), name?.Trim(), StringComparison.OrdinalIgnoreCase);
+        private static bool SameName(DatabaseObject item, string name) =>
+            string.Equals(item.Name?.Trim(), name?.Trim(), StringComparison.OrdinalIgnoreCase);
 
-        private bool HasTag(Game game, string name) =>
-            game.TagIds?.Any(id => _api.Database.Tags[id] is Tag tag && SameName(tag, name)) == true;
+        private bool HasFeature(Game game, string name) =>
+            game.FeatureIds?.Any(id => _api.Database.Features[id] is GameFeature feature && SameName(feature, name)) == true;
 
         public static string CleanName(string name)
         {

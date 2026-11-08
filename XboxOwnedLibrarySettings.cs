@@ -9,8 +9,8 @@ namespace XboxOwnedLibrary
         private bool _syncOnLibraryUpdate = true;
         private bool _importGamesWithGold = false;
         private bool _useStoreMetadata = false;
-        private bool _addPlayAnywhereTag = false;
-        private string _playAnywhereTagName = "Xbox Play Anywhere";
+        private bool _addPlayAnywhereFeature = false;
+        private string _playAnywhereFeatureName = "Xbox Play Anywhere";
         private string _market = "US";
         private string _language = "en-US";
         private string _lastSync = string.Empty;
@@ -24,9 +24,14 @@ namespace XboxOwnedLibrary
         /// <summary>Fill details and artwork from the Microsoft Store instead of leaving them to Playnite's metadata download.</summary>
         public bool UseStoreMetadata { get => _useStoreMetadata; set => SetValue(ref _useStoreMetadata, value); }
 
-        /// <summary>Tag owned Xbox Play Anywhere games, new and already in Playnite. Tags are only added, never removed.</summary>
-        public bool AddPlayAnywhereTag { get => _addPlayAnywhereTag; set => SetValue(ref _addPlayAnywhereTag, value); }
-        public string PlayAnywhereTagName { get => _playAnywhereTagName; set => SetValue(ref _playAnywhereTagName, value); }
+        /// <summary>Add a feature to owned Xbox Play Anywhere games, new and already in Playnite. Only added, never removed.</summary>
+        public bool AddPlayAnywhereFeature { get => _addPlayAnywhereFeature; set => SetValue(ref _addPlayAnywhereFeature, value); }
+        public string PlayAnywhereFeatureName { get => _playAnywhereFeatureName; set => SetValue(ref _playAnywhereFeatureName, value); }
+
+        // Pre-1.1 settings used a tag. Read-only migration: carried into the feature
+        // settings on load, written back as null.
+        public bool? AddPlayAnywhereTag { get => null; set { if (value == true) AddPlayAnywhereFeature = true; } }
+        public string PlayAnywhereTagName { get => null; set { if (!string.IsNullOrWhiteSpace(value)) PlayAnywhereFeatureName = value; } }
 
         public string Market { get => _market; set => SetValue(ref _market, value); }
         public string Language { get => _language; set => SetValue(ref _language, value); }
@@ -97,9 +102,9 @@ namespace XboxOwnedLibrary
                 errors.Add("Language must be set, such as en-US.");
             }
 
-            if (Settings.AddPlayAnywhereTag && string.IsNullOrWhiteSpace(Settings.PlayAnywhereTagName))
+            if (Settings.AddPlayAnywhereFeature && string.IsNullOrWhiteSpace(Settings.PlayAnywhereFeatureName))
             {
-                errors.Add("Enter a tag name for Play Anywhere games, or turn the option off.");
+                errors.Add("Enter a feature name for Play Anywhere games, or turn the option off.");
             }
 
             return errors.Count == 0;

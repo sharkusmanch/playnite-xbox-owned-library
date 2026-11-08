@@ -20,13 +20,13 @@
         <CheckBox IsChecked="{Binding Settings.ImportGamesWithGold}" Margin="0,0,0,8"
                   Content="Include Games with Gold titles (playable only while subscribed; tagged &quot;Xbox Games with Gold&quot;)"/>
         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-            <CheckBox IsChecked="{Binding Settings.AddPlayAnywhereTag}" VerticalAlignment="Center"
-                      Content="Tag owned Xbox Play Anywhere games with:"/>
-            <TextBox Text="{Binding Settings.PlayAnywhereTagName}" Width="200" Margin="10,0,0,0"
-                     IsEnabled="{Binding Settings.AddPlayAnywhereTag}"/>
+            <CheckBox IsChecked="{Binding Settings.AddPlayAnywhereFeature}" VerticalAlignment="Center"
+                      Content="Add a feature to owned Xbox Play Anywhere games:"/>
+            <TextBox Text="{Binding Settings.PlayAnywhereFeatureName}" Width="200" Margin="10,0,0,0"
+                     IsEnabled="{Binding Settings.AddPlayAnywhereFeature}"/>
         </StackPanel>
         <TextBlock TextWrapping="Wrap" Margin="20,0,0,8" Opacity="0.7"
-                   Text="Applies to games this extension adds and to owned Play Anywhere games already in your Xbox library. The tag is only ever added, never removed."/>
+                   Text="Applies to games this extension adds and to owned Play Anywhere games already in your Xbox library. The feature is only ever added, never removed."/>
         <CheckBox IsChecked="{Binding Settings.UseStoreMetadata}" Margin="0,0,0,15"
                   Content="Fill details and artwork from the Microsoft Store (off: leave them to Playnite's metadata download)"/>
 
