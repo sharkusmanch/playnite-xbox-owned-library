@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="XboxOwnedLibrary.XboxOwnedLibrarySettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="600">
+    <StackPanel Margin="20">
+        <TextBlock TextWrapping="Wrap" Margin="0,0,0,10"
+                   Text="Adds Xbox PC games you own but have never launched. They are added as Xbox library games, so the Xbox plugin installs and launches them and later library updates do not duplicate them."/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+            <Button Content="Sign in" Command="{Binding SignInCommand}" Margin="0,0,10,0"/>
+            <Button Content="Sign out" Command="{Binding SignOutCommand}" Margin="0,0,10,0"/>
+            <TextBlock Text="{Binding SignInStatus}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <CheckBox IsChecked="{Binding Settings.SyncOnLibraryUpdate}" Margin="0,0,0,8"
+                  Content="Add newly found owned games after every library update"/>
+        <CheckBox IsChecked="{Binding Settings.ImportGamesWithGold}" Margin="0,0,0,8"
+                  Content="Include Games with Gold titles (playable only while subscribed; tagged &quot;Xbox Games with Gold&quot;)"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <CheckBox IsChecked="{Binding Settings.AddPlayAnywhereTag}" VerticalAlignment="Center"
+                      Content="Tag owned Xbox Play Anywhere games with:"/>
+            <TextBox Text="{Binding Settings.PlayAnywhereTagName}" Width="200" Margin="10,0,0,0"
+                     IsEnabled="{Binding Settings.AddPlayAnywhereTag}"/>
+        </StackPanel>
+        <TextBlock TextWrapping="Wrap" Margin="20,0,0,8" Opacity="0.7"
+                   Text="Applies to games this extension adds and to owned Play Anywhere games already in your Xbox library. The tag is only ever added, never removed."/>
+        <CheckBox IsChecked="{Binding Settings.UseStoreMetadata}" Margin="0,0,0,15"
+                  Content="Fill details and artwork from the Microsoft Store (off: leave them to Playnite's metadata download)"/>
+
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <TextBlock Text="Store market:" VerticalAlignment="Center" Width="110"/>
+            <TextBox Text="{Binding Settings.Market}" Width="60"/>
+            <TextBlock Text="Language:" VerticalAlignment="Center" Margin="20,0,10,0"/>
+            <TextBox Text="{Binding Settings.Language}" Width="80"/>
+        </StackPanel>
+
+        <TextBlock Text="{Binding Settings.LastSync, StringFormat=Last sync: {0}}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,10 @@
+﻿Id: XboxOwnedLibrary_2c8730ad93a04a6d
+Name: Xbox Owned Library
+Author: sharkusmanch
+Version: 1.0.0
+Module: XboxOwnedLibrary.dll
+Icon: icon.png
+Type: GameLibrary
+Links:
+  - Name: GitHub
+    Url: https://github.com/sharkusmanch/playnite-xbox-owned-library

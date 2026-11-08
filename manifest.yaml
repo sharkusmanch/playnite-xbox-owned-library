@@ -1,0 +1,16 @@
+AddonId: XboxOwnedLibrary_2c8730ad93a04a6d
+Packages:
+  - Version: 1.0.0
+    RequiredApiVersion: 6.17.0
+    ReleaseDate: 2026-11-03
+    PackageUrl: https://github.com/sharkusmanch/playnite-xbox-owned-library/releases/download/v1.0.0/XboxOwnedLibrary_v1.0.0.pext
+    Changelog:
+      - Add owned Xbox PC games that were never launched, read from the Microsoft Store collection instead of Xbox title history
+      - Games are added as Xbox library games (GameId = package family name), so the Xbox plugin installs and launches them without duplicates
+      - Resolve bundles to their PC games and skip demos, betas and add-ons
+      - Runs as part of Playnite's library update, so new games get metadata from your metadata sources
+      - Optional Microsoft Store details and artwork instead of Playnite's metadata download
+      - Optional Games with Gold import, tagged
+      - Optional customizable tag for owned Xbox Play Anywhere games, new and already in the library
+      - Count Play Anywhere games whose catalog lists only Xbox packages (HITMAN 3, Boltgun) as playable on PC
+      - Preview mode and a per-sync report

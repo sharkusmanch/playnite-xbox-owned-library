@@ -1,0 +1,11 @@
+bin/
+obj/
+dist/
+.distraw/
+*.user
+*.suo
+*.vs/
+.vs/
+*.DotSettings
+packages/
+.claude/

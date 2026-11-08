@@ -1,0 +1,48 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net462</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>XboxOwnedLibrary</AssemblyName>
+    <RootNamespace>XboxOwnedLibrary</RootNamespace>
+    <UseWPF>true</UseWPF>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The test project lives under Tests/ and has its own csproj; without this the
+         SDK's default **/*.cs glob would also compile it into the plugin. -->
+    <Compile Remove="Tests/**" />
+    <None Remove="Tests/**" />
+    <Page Remove="Tests/**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="PlayniteSDK" Version="6.17.0" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Security" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="XboxOwnedLibrary.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="extension.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="icon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Localization\*.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

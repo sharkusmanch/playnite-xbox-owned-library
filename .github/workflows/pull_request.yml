@@ -1,0 +1,67 @@
+on:
+  - pull_request
+
+name: Main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Validate version consistency
+        run: |
+          ext_version=$(yq '.Version' extension.yaml)
+          manifest_version=$(yq '.Packages[0].Version' manifest.yaml)
+          addon_id=$(yq '.AddonId' manifest.yaml)
+          repo_url="https://github.com/${{ github.repository }}"
+
+          echo "extension.yaml version: $ext_version"
+          echo "manifest.yaml version:  $manifest_version"
+
+          errors=0
+
+          if [ "$ext_version" != "$manifest_version" ]; then
+            echo "::error::Version mismatch: extension.yaml ($ext_version) != manifest.yaml ($manifest_version)"
+            errors=$((errors + 1))
+          fi
+
+          expected_url="${repo_url}/releases/download/v${ext_version}/${addon_id%%_*}_v${ext_version}.pext"
+          actual_url=$(yq '.Packages[0].PackageUrl' manifest.yaml)
+
+          echo "Expected PackageUrl: $expected_url"
+          echo "Actual PackageUrl:   $actual_url"
+
+          if [ "$expected_url" != "$actual_url" ]; then
+            echo "::error::PackageUrl mismatch in manifest.yaml. Expected: $expected_url"
+            errors=$((errors + 1))
+          fi
+
+          # The release job renders these with `"- " + .`, which dies on anything that
+          # isn't a plain string. An unquoted entry containing ": " parses as a YAML map,
+          # so catch it here rather than at release time.
+          if [ -n "$(yq '.Packages[0].Changelog[] | select(tag != "!!str")' manifest.yaml)" ]; then
+            echo "::error::manifest.yaml changelog entries must all be strings. An entry containing ': ' parses as a YAML map - wrap it in quotes."
+            errors=$((errors + 1))
+          fi
+
+          if [ $errors -gt 0 ]; then
+            exit 1
+          fi
+
+          echo "All validations passed."
+
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      # No Playnite download here: only the release job needs Toolbox.exe to pack the
+      # .pext. The old step also globbed Playnite*.zip, which no current Playnite
+      # release publishes, blocking the release-downloader upgrade.
+      - run: |
+          dotnet build XboxOwnedLibrary.csproj -c Release
+
+      - name: Test
+        run: |
+          dotnet test Tests/XboxOwnedLibrary.Tests.csproj -c Release
